@@ -1,0 +1,47 @@
+# Virtual environment
+.venv/
+env/
+venv/
+env.bak/
+bin/
+lib/
+include/
+
+# Byte-code files
+*.pyc
+__pycache__/
+
+# IDE-specific files (optional, adjust for your IDE)
+.idea/  # JetBrains IDEs (e.g., PyCharm)
+.vscode/ # VS Code
+*.swp   # Vim temporary files
+
+# Test and coverage reports
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.pytest_cache/
+
+# Distribution and packaging
+dist/
+build/
+*.egg-info/
+*.manifest
+*.spec
+
+# OS-specific files
+.DS_Store # macOS
+.directory # KDE directory preferences
+.Trash-* # Linux trash folder
+
+# Other common ignored files
+Pipfile.lock # If you use pipenv, it's generally recommended to include this in version control
+poetry.lock # If you use poetry, it's generally recommended to include this in version control
+pip-log.txt
+log.txt
+*.log
+test.db # For local database files
+
+# Jupyter Notebook files
+.ipynb_checkpoints
