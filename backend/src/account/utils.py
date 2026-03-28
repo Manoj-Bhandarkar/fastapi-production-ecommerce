@@ -1,7 +1,8 @@
+from fastapi import HTTPException, status
 from passlib.context import CryptContext
 from datetime import timedelta, datetime, timezone
 from decouple import config
-from jose import jwt
+from jose import ExpiredSignatureError, JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.account.models import User, RefreshToken
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -48,3 +49,14 @@ async def create_tokens(session: AsyncSession, user: User):
         "refresh_token": refresh_token.token,
         "token_type": "bearer",
     }
+
+
+def decode_token(token: str):
+    try:
+        return jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
+        )
+    except JWTError: 
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token")
