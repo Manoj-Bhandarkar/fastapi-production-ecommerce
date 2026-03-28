@@ -9,10 +9,10 @@ import uuid
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-JWT_ACCESS_TOKEN_TIME_MIN = config("JWT_ACCESS_TOKEN_TIME_MIN")
+JWT_ACCESS_TOKEN_TIME_MIN = config("JWT_ACCESS_TOKEN_TIME_MIN", cast=int)
 JWT_ALGORITHM = config("JWT_ALGORITHM")
 JWT_SECRET_KEY = config("JWT_SECRET_KEY")
-JWT_REFRESH_TOKEN_TIME_DAY = config("JWT_REFRESH_TOKEN_TIME_DAY")
+JWT_REFRESH_TOKEN_TIME_DAY = config("JWT_REFRESH_TOKEN_TIME_DAY", cast=int)
 
 
 def hash_password(password: str):
@@ -20,7 +20,7 @@ def hash_password(password: str):
 
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify_password(plain_password, hashed_password)
+    return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
@@ -45,6 +45,6 @@ async def create_tokens(session: AsyncSession, user: User):
     await session.commit()
     return {
         "access_token": access_token,
-        "refresh_token": refresh_token,
+        "refresh_token": refresh_token.token,
         "token_type": "bearer",
     }

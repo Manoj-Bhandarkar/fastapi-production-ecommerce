@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
+from fastapi.responses import JSONResponse
 from src.db.config import SessionDep
 from src.account.schemas import UserCreate, UserOut, UserLogin
 from src.account.services import create_user, authenticate_user
@@ -21,3 +22,21 @@ async def login(session: SessionDep, user_login: UserLogin):
         )
 
     tokens = await create_tokens(session, user)
+    response = JSONResponse(content={"message":"Login Successful"})
+    response.set_cookie(
+        "access_token",
+        value=tokens["access_token"],
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=60*60*24*1
+    )
+    response.set_cookie(
+        "refresh_token",
+        value=tokens["refresh_token"],
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=60*60*24*7
+    )
+    return response
