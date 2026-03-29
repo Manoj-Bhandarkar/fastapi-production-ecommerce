@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from src.account.models import User
 from src.db.config import SessionDep
 from src.account.schemas import UserCreate, UserOut, UserLogin
-from src.account.services import create_user, authenticate_user
+from src.account.services import create_user, authenticate_user, email_verification_send
 from src.account.utils import create_tokens, verify_refresh_token
 from src.account.deps import get_current_user
 
@@ -80,3 +80,7 @@ async def refresh_token(session: SessionDep, request: Request):
         samesite="lax",
         max_age=60 * 60 * 24 * 7,
     )
+
+@router.post("/send-verification-email")
+async def send_verification_email(user:User = Depends(get_current_user)):
+    return await email_verification_send(user)

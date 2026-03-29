@@ -14,6 +14,9 @@ JWT_ACCESS_TOKEN_TIME_MIN = config("JWT_ACCESS_TOKEN_TIME_MIN", cast=int)
 JWT_ALGORITHM = config("JWT_ALGORITHM")
 JWT_SECRET_KEY = config("JWT_SECRET_KEY")
 JWT_REFRESH_TOKEN_TIME_DAY = config("JWT_REFRESH_TOKEN_TIME_DAY", cast=int)
+EMAIL_VERIFICATION_TOKEN_TIME_HOUR = config(
+    "EMAIL_VERIFICATION_TOKEN_TIME_HOUR", cast=int
+)
 
 
 def hash_password(password: str):
@@ -77,3 +80,11 @@ async def verify_refresh_token(session: AsyncSession, token: str):
             user_result = await session.scalars(user_stmt)
             return user_result.first()
     return None
+
+
+def create_email_verification_token(user_id: int):
+    expire = datetime.now(timezone.utc) + timedelta(
+        hours=EMAIL_VERIFICATION_TOKEN_TIME_HOUR
+    )
+    to_encode = {"sub": str(user_id), "type": "verify_email", "exp": expire}
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Select
 from fastapi import HTTPException, status
 from src.account.schemas import UserCreate, UserLogin
-from src.account.utils import hash_password, verify_password
+from src.account.utils import create_email_verification_token, hash_password, verify_password
 
 async def create_user(session: AsyncSession, user: UserCreate):
     stmt = Select(User).where(User.email == user.email)
@@ -31,3 +31,9 @@ async def authenticate_user(session: AsyncSession, user_login: UserLogin):
         return None
     
     return user
+
+async def email_verification_send(user:User):
+    token = create_email_verification_token(user.id)
+    link = f"http://localhost:8000/api/account/verify?token={token}"
+    print(f"Verify Link email : {link}")
+    return {"msg": "Verification email sent successfully..."}
