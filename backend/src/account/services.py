@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Select
 from fastapi import HTTPException, status
 from src.account.schemas import UserCreate, UserLogin
-from src.account.utils import create_email_verification_token, hash_password, verify_password
+from src.account.utils import create_email_verification_token, hash_password, verify_email_token_and_get_user_id, verify_password
 
 async def create_user(session: AsyncSession, user: UserCreate):
     stmt = Select(User).where(User.email == user.email)
@@ -29,11 +29,31 @@ async def authenticate_user(session: AsyncSession, user_login: UserLogin):
 
     if not user or not verify_password(user_login.password, user.hashed_password):
         return None
-    
+
     return user
 
-async def email_verification_send(user:User):
+
+async def email_verification_send(user: User):
     token = create_email_verification_token(user.id)
     link = f"http://localhost:8000/api/account/verify?token={token}"
     print(f"Verify Link email : {link}")
     return {"msg": "Verification email sent successfully..."}
+
+
+async def verify_email_token(session: AsyncSession, token: str):
+    user_id = verify_email_token_and_get_user_id(token,"verify_email")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token")
+    
+    stmt = Select(User).where(User.id == user_id)
+    result = await session.scalars(stmt)
+    user = result.first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    user.is_verified = True
+    session.add(user)
+    await session.commit()
+    return {"msg":"Email verified successfully..."}
+      
