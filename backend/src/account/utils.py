@@ -3,9 +3,9 @@ from passlib.context import CryptContext
 from datetime import timedelta, datetime, timezone
 from decouple import config
 from jose import ExpiredSignatureError, JWTError, jwt
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.account.models import User, RefreshToken
-from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -58,5 +58,22 @@ def decode_token(token: str):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
         )
-    except JWTError: 
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token")
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token"
+        )
+
+
+async def verify_refresh_token(session: AsyncSession, token: str):
+    stmt = select(RefreshToken).where(RefreshToken.token == token)
+    result = await session.scalars(stmt)
+    db_refresh_token = result.first()
+    if db_refresh_token and not db_refresh_token.revoked:
+        expires_at = db_refresh_token.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at > datetime.now(timezone.utc):
+            user_stmt = select(User).where(User.id == db_refresh_token.user_id)
+            user_result = await session.scalars(user_stmt)
+            return user_result.first()
+    return None
