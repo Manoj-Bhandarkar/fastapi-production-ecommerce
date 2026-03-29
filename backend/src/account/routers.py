@@ -68,7 +68,7 @@ async def refresh_token(session: SessionDep, request: Request):
        "access_token",
        value=tokens["access_token"],
        httponly=True,
-       secure=True,
+       secure=False,
        samesite="lax",
        max_age=60 * 60 * 24 * 1,
     )
@@ -76,10 +76,11 @@ async def refresh_token(session: SessionDep, request: Request):
         "refresh_token",
         value=tokens["refresh_token"],
         httponly=True,
-        secure=True,
+        secure=False,
         samesite="lax",
         max_age=60 * 60 * 24 * 7,
     )
+    return response
 
 @router.post("/send-verification-email")
 async def send_verification_email(user:User = Depends(get_current_user)):

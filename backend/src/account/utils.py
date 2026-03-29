@@ -47,9 +47,10 @@ async def create_tokens(session: AsyncSession, user: User):
     )
     session.add(refresh_token)
     await session.commit()
+    await session.refresh(refresh_token)
     return {
         "access_token": access_token,
-        "refresh_token": refresh_token.token,
+        "refresh_token": refresh_token_str,
         "token_type": "bearer",
     }
 
@@ -69,16 +70,15 @@ def decode_token(token: str):
 
 async def verify_refresh_token(session: AsyncSession, token: str):
     stmt = select(RefreshToken).where(RefreshToken.token == token)
-    result = await session.scalars(stmt)
-    db_refresh_token = result.first()
+    db_refresh_token = await session.scalar(stmt)
     if db_refresh_token and not db_refresh_token.revoked:
         expires_at = db_refresh_token.expires_at
         if expires_at.tzinfo is None:
             expires_at = expires_at.replace(tzinfo=timezone.utc)
         if expires_at > datetime.now(timezone.utc):
             user_stmt = select(User).where(User.id == db_refresh_token.user_id)
-            user_result = await session.scalars(user_stmt)
-            return user_result.first()
+            user_result = await session.scalar(user_stmt)
+            return user_result
     return None
 
 
