@@ -2,7 +2,7 @@ from src.account.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Select
 from fastapi import HTTPException, status
-from src.account.schemas import PasswordResetEmailRequest, PasswordChangeRequest, UserCreate, UserLogin
+from src.account.schemas import PasswordResetEmailRequest, PasswordChangeRequest, PasswordResetRequest, UserCreate, UserLogin
 from src.account.utils import create_email_verification_token, create_password_reset_token, get_user_by_email, hash_password, verify_email_token_and_get_user_id, verify_password
 
 async def create_user(session: AsyncSession, user: UserCreate):
@@ -73,3 +73,20 @@ async def password_reset_email_send(session:AsyncSession, data:PasswordResetEmai
     link = f"http://localhost:8000/api/account/password-reset?token={token}"
     print(f"Reset your password : {link}")
     return {"msg": "Password reset link sent successfully..."}
+
+async def verify_password_reset_token(session: AsyncSession, data = PasswordResetRequest):
+    user_id = verify_email_token_and_get_user_id(data.token, "password_reset")
+    if not user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token")
+    
+    stmt = Select(User).where(User.id == user_id)
+    result = await session.scalars(stmt)
+    user = result.first()
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    user.hashed_password = hash_password(data.new_password)
+    session.add(user)
+    await session.commit()
+    return {"msg":"Password reset successfully..."}
