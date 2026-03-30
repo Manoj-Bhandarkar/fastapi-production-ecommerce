@@ -2,7 +2,7 @@ from src.account.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Select
 from fastapi import HTTPException, status
-from src.account.schemas import UserCreate, UserLogin
+from src.account.schemas import PasswordChangeRequest, UserCreate, UserLogin
 from src.account.utils import create_email_verification_token, hash_password, verify_email_token_and_get_user_id, verify_password
 
 async def create_user(session: AsyncSession, user: UserCreate):
@@ -56,4 +56,10 @@ async def verify_email_token(session: AsyncSession, token: str):
     session.add(user)
     await session.commit()
     return {"msg":"Email verified successfully..."}
-      
+
+async def change_password(session:AsyncSession, user:User, data:PasswordChangeRequest):
+    if not verify_password(data.old_password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Old password is incorrect")
+    user.hashed_password = hash_password(data.new_password)
+    session.add(user)
+    await session.commit()
