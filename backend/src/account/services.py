@@ -2,8 +2,8 @@ from src.account.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import Select
 from fastapi import HTTPException, status
-from src.account.schemas import PasswordChangeRequest, UserCreate, UserLogin
-from src.account.utils import create_email_verification_token, hash_password, verify_email_token_and_get_user_id, verify_password
+from src.account.schemas import PasswordResetEmailRequest, PasswordChangeRequest, UserCreate, UserLogin
+from src.account.utils import create_email_verification_token, create_password_reset_token, get_user_by_email, hash_password, verify_email_token_and_get_user_id, verify_password
 
 async def create_user(session: AsyncSession, user: UserCreate):
     stmt = Select(User).where(User.email == user.email)
@@ -63,3 +63,13 @@ async def change_password(session:AsyncSession, user:User, data:PasswordChangeRe
     user.hashed_password = hash_password(data.new_password)
     session.add(user)
     await session.commit()
+
+async def password_reset_email_send(session:AsyncSession, data:PasswordResetEmailRequest):
+    user = await get_user_by_email(session, data.email)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    token = create_password_reset_token(user.id)
+    link = f"http://localhost:8000/api/account/password-reset?token={token}"
+    print(f"Reset your password : {link}")
+    return {"msg": "Password reset link sent successfully..."}

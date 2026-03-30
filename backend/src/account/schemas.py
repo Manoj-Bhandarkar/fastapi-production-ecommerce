@@ -34,3 +34,7 @@ class PasswordChangeRequest(BaseModel):
         if not any(char.isdigit() for char in value):
             raise ValueError("Password must contain at least one digit")
         return value
+
+
+class PasswordResetEmailRequest(BaseModel):
+    email: EmailStr

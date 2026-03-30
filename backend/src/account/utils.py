@@ -17,6 +17,7 @@ JWT_REFRESH_TOKEN_TIME_DAY = config("JWT_REFRESH_TOKEN_TIME_DAY", cast=int)
 EMAIL_VERIFICATION_TOKEN_TIME_HOUR = config(
     "EMAIL_VERIFICATION_TOKEN_TIME_HOUR", cast=int
 )
+EMAIL_PASSWORD_RESET_TOKEN_TIME_HOUR = config("EMAIL_PASSWORD_RESET_TOKEN_TIME_HOUR", cast=int)
 
 
 def hash_password(password: str):
@@ -94,3 +95,15 @@ def verify_email_token_and_get_user_id(token:str, token_type:str):
     if not payload or payload.get("type") != token_type:
         return None
     return int(payload.get("sub"))
+
+async def get_user_by_email(session:AsyncSession, email:str):
+    stmt = select(User).where(User.email == email)
+    result = await session.scalar(stmt)
+    return result
+
+def create_password_reset_token(user_id: int):
+    expire = datetime.now(timezone.utc) + timedelta(
+        hours=EMAIL_PASSWORD_RESET_TOKEN_TIME_HOUR
+    )
+    to_encode = {"sub": str(user_id), "type": "password_reset", "exp": expire}
+    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
