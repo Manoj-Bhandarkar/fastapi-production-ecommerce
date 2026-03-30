@@ -74,7 +74,7 @@ async def password_reset_email_send(session:AsyncSession, data:PasswordResetEmai
     print(f"Reset your password : {link}")
     return {"msg": "Password reset link sent successfully..."}
 
-async def verify_password_reset_token(session: AsyncSession, data = PasswordResetRequest):
+async def verify_password_reset_token(session: AsyncSession, data: PasswordResetRequest):
     user_id = verify_email_token_and_get_user_id(data.token, "password_reset")
     if not user_id:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token")
