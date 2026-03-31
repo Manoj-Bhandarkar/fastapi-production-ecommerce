@@ -5,7 +5,7 @@ from src.db.config import SessionDep
 from src.account.schemas import PasswordChangeRequest, PasswordResetEmailRequest, PasswordResetRequest, UserCreate, UserOut, UserLogin
 from src.account.services import password_reset_email_send, change_password, create_user, authenticate_user, email_verification_send, verify_email_token, verify_password_reset_token
 from src.account.utils import create_tokens, verify_refresh_token
-from src.account.deps import get_current_user
+from src.account.deps import get_current_user, require_admin
 
 router = APIRouter()
 
@@ -102,4 +102,8 @@ async def send_password_reset_email(session: SessionDep, data: PasswordResetEmai
 @router.post("/verify-password-reset-token")
 async def verify_password_reset_email(session: SessionDep, data: PasswordResetRequest, ):
     return await verify_password_reset_token(session, data)
-   
+
+
+@router.get("/admin")
+async def admin(user: User = Depends(require_admin)):
+    return {"msg": f"Welcome Admin {user.email}"}
