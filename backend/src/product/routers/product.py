@@ -1,11 +1,10 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, status, Query
-from app.account.models import User
-from app.db.config import SessionDep
-from app.product.schemas import PaginatedProductOut, ProductCreate, ProductOut, ProductUpdate
-from app.account.deps import require_admin
-from app.product.services import create_product, delete_product, get_all_products, get_product_by_slug, search_products, update_product_by_id
-
+from fastapi import APIRouter, Depends, UploadFile, File, Form
+from src.account.models import User
+from src.db.config import SessionDep
+from src.product.schemas import ProductCreate, ProductOut
+from src.account.deps import require_admin
+from src.product.services import create_product
 router = APIRouter()
 
 @router.post("", response_model=ProductOut)
