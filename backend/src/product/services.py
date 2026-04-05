@@ -80,3 +80,8 @@ async def get_all_products(
     "limit": limit,
     "items": products
   }
+
+async def get_product_by_slug(session: AsyncSession, slug: str) -> ProductOut | None:
+  stmt = select(Product).options(selectinload(Product.categories)).where(Product.slug == slug)
+  result = await session.execute(stmt)
+  return result.scalar()
