@@ -3,7 +3,7 @@ from sqlalchemy import select, func
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.product.utils import generate_slug, save_upload_file
-from src.product.schemas import CategoryCreate, CategoryOut, ProductCreate
+from src.product.schemas import CategoryCreate, CategoryOut, ProductCreate, ProductOut
 from src.product.models import Category, Product
 from sqlalchemy.orm import selectinload
 
