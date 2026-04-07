@@ -2,6 +2,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Float, DateTime, ForeignKey, Table, Column, Text
 from datetime import datetime, timezone
 from src.db.base import Base
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+  from src.cart.models import CartItem
 
 
 product_category_table = Table(
@@ -28,6 +32,8 @@ class Product(Base):
         DateTime(timezone = True), default = lambda: datetime.now(timezone.utc)
     )
     categories: Mapped[list["Category"]] = relationship("Category", secondary=product_category_table, back_populates="products")
+    cart_items: Mapped[list["CartItem"]] = relationship("CartItem", back_populates="product")
+
 
 class Category(Base):
     __tablename__ = "categories"

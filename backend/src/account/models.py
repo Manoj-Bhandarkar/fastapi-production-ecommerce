@@ -2,7 +2,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Boolean, DateTime, ForeignKey
 from datetime import datetime, timezone
 from src.db.base import Base
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from src.cart.models import CartItem
 
 class User(Base):
     __tablename__ = "Users"
@@ -22,6 +25,9 @@ class User(Base):
 
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         "RefreshToken", back_populates="user", cascade="all, delete-orphan"
+    )
+    cart_items: Mapped[list["CartItem"]] = relationship(
+        "CartItem", back_populates="user", cascade="all, delete-orphan"
     )
 
 
