@@ -1,11 +1,14 @@
 from pydantic import BaseModel
 
+
 class CartItemBase(BaseModel):
     product_id: int
     quantity: int
 
+
 class CartItemCreate(CartItemBase):
     pass
+
 
 class CartItemOut(BaseModel):
     id: int
@@ -15,6 +18,10 @@ class CartItemOut(BaseModel):
     quantity: int
     price: float
     total: float
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = {"from_attributes": True}
+
+
+class CartSummary(BaseModel):
+    items: list[CartItemOut]
+    total_quantity: int
+    total_price: float
