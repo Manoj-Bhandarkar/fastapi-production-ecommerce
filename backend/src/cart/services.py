@@ -84,3 +84,71 @@ async def list_user_cart(session: AsyncSession, user_id: int) -> CartSummary:
     return CartSummary(
         items=cart_data, total_quantity=total_quantity, total_price=total_price
     )
+
+
+async def change_cart_item_quantity_by_product(
+    session: AsyncSession, product_id: int, user_id: int, delta: int
+):
+    product = await session.get(Product, product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
+        )
+
+    stmt = select(CartItem).where(
+        CartItem.user_id == user_id, CartItem.product_id == product_id
+    )
+    result = await session.execute(stmt)
+    item = result.scalar_one_or_none()
+
+    if not item:
+        if delta < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Item not in cart"
+            )
+
+        if product.stock_quantity < 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient stock"
+            )
+
+        new_item = CartItem(
+            user_id=user_id, product_id=product_id, quantity=1, price=product.price
+        )
+        session.add(new_item)
+        await session.commit()
+        await session.refresh(new_item)
+        return CartItemOut(
+            id=new_item.id,
+            product_id=new_item.product_id,
+            user_id=user_id,
+            product_title=product.title,
+            quantity=new_item.quantity,
+            price=new_item.price,
+            total=round(product.price * new_item.quantity, 2),
+        )
+    new_quantity = item.quantity + delta
+    if new_quantity <= 0:
+        await session.delete(item)
+        await session.commit()
+        return {"message": "Item removed from cart"}
+
+    if product.stock_quantity < new_quantity:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Insufficient stock"
+        )
+
+    item.quantity = new_quantity
+    item.price = product.price
+    await session.commit()
+    await session.refresh(item)
+
+    return CartItemOut(
+        id=item.id,
+        product_id=item.product_id,
+        user_id=user_id,
+        product_title=product.title,
+        quantity=item.quantity,
+        price=item.price,
+        total=round(product.price * item.quantity, 2),
+    )
