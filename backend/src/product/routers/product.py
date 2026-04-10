@@ -13,7 +13,13 @@ from src.account.models import User
 from src.db.config import SessionDep
 from src.product.schemas import ProductCreate, ProductOut, PaginatedProductOut
 from src.account.deps import require_admin
-from src.product.services import create_product, delete_product, get_all_products, get_product_by_slug
+from src.product.services import (
+    create_product,
+    delete_product,
+    get_all_products,
+    get_product_by_slug,
+    search_products,
+)
 
 router = APIRouter()
 
@@ -84,10 +90,10 @@ async def products_search(
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def product_delete(
-  session: SessionDep,
-  product_id: int,
-  admin_user: User = Depends(require_admin)
+    session: SessionDep, product_id: int, admin_user: User = Depends(require_admin)
 ):
-  success = await delete_product(session, product_id)
-  if not success:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+    success = await delete_product(session, product_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
+        )

@@ -9,7 +9,9 @@ from alembic import context
 
 from decouple import config as env_config
 from src.db.base import Base
-from src.db import models   # for every register frist in models and then auto matic register in alembic
+from src.db import (
+    models,
+)  # for every register frist in models and then auto matic register in alembic
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -60,7 +62,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        compare_type=True,	#foreign key, PK
+        compare_type=True,  # foreign key, PK
     )
 
     with context.begin_transaction():
@@ -68,7 +70,9 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+    context.configure(
+        connection=connection, target_metadata=target_metadata, compare_type=True
+    )
 
     with context.begin_transaction():
         context.run_migrations()

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.cart.models import CartItem
 
+
 class User(Base):
     __tablename__ = "Users"
 
