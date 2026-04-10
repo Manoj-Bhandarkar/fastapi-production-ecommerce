@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi import APIRouter, Depends
 from src.account.deps import get_current_user
 from src.account.models import User

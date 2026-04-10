@@ -152,3 +152,14 @@ async def change_cart_item_quantity_by_product(
         price=item.price,
         total=round(product.price * item.quantity, 2),
     )
+
+
+async def delete_cart_item(session: AsyncSession, cart_item_id: int):
+    item = await session.get(CartItem, cart_item_id)
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Item not found"
+        )
+    await session.delete(item)
+    await session.commit()
+    return item
