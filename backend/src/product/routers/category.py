@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.account.deps import require_admin
-from src.account.models import User
 from src.db.config import SessionDep
 from src.product.schemas import CategoryCreate, CategoryOut
 from src.product.services import create_category, get_all_category, delete_category

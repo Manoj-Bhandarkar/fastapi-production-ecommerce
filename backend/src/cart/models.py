@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Float, Integer, ForeignKey
+from sqlalchemy import Float, ForeignKey
 from src.account.models import User
 from src.product.models import Product
 from src.db.base import Base

@@ -9,9 +9,8 @@ from alembic import context
 
 from decouple import config as env_config
 from src.db.base import Base
-from src.db import (
-    models,
-)  # for every register frist in models and then auto matic register in alembic
+from src.db import models
+# for every register frist in models and then auto matic register in alembic
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
