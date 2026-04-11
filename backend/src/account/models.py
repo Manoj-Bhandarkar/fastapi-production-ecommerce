@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.cart.models import CartItem
+    from backend.src.shipping.models import ShippingAddress
 
 
 class User(Base):
@@ -30,6 +31,10 @@ class User(Base):
     cart_items: Mapped[list["CartItem"]] = relationship(
         "CartItem", back_populates="user", cascade="all, delete-orphan"
     )
+    shipping_addresses: Mapped[list["ShippingAddress"]] = relationship(
+        "ShippingAddress", back_populates="user", cascade="all, delete-orphan"
+    )
+
 
 
 class RefreshToken(Base):
