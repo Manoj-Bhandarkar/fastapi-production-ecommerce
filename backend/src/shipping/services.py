@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.shipping.schemas import ShippingAddressCreate, ShippingAddressOut
@@ -22,3 +23,13 @@ async def list_user_shipping_addresses(
   stmt = select(ShippingAddress).where(ShippingAddress.user_id == user_id)
   result = await session.execute(stmt)
   return result.scalars().all()
+
+async def get_user_shipping_address_by_address_id(
+  session: AsyncSession,
+  address_id: int,
+  user_id: int
+) -> ShippingAddressOut:
+  address = await session.get(ShippingAddress, address_id)
+  if not address or address.user_id != user_id:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Address not found or not authorized")
+  return address
