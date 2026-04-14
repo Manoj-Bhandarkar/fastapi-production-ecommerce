@@ -10,8 +10,10 @@ class ShippingAddressBase(BaseModel):
     pin_code: str
     country: str
 
+
 class ShippingAddressCreate(ShippingAddressBase):
     pass
+
 
 class ShippingAddressOut(ShippingAddressBase):
     id: int
