@@ -19,3 +19,13 @@ class ShippingAddressOut(ShippingAddressBase):
     id: int
     user_id: int
     model_config = {"from_attributes": True}
+
+
+class ShippingAddressUpdate(BaseModel):
+    name: str | None = None
+    address_line1: str | None = None
+    address_line2: str | None = None
+    city: str | None = None
+    state: str | None = None
+    pin_code: str | None = None
+    country: str | None = None
