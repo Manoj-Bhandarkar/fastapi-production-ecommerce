@@ -1,7 +1,11 @@
 from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.shipping.schemas import ShippingAddressCreate, ShippingAddressOut, ShippingAddressUpdate
+from src.shipping.schemas import (
+    ShippingAddressCreate,
+    ShippingAddressOut,
+    ShippingAddressUpdate,
+)
 from src.shipping.models import ShippingAddress
 
 
@@ -50,14 +54,16 @@ async def update_user_shipping_address_by_address_id(
     await session.refresh(address)
     return address
 
+
 async def delete_shipping_address_by_address_id(
-  session: AsyncSession, 
-  user_id: int, 
-  address_id: int
+    session: AsyncSession, user_id: int, address_id: int
 ):
-  address = await session.get(ShippingAddress, address_id)
-  if not address or address.user_id != user_id:
-      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Address not found or not authorized")
-  await session.delete(address)
-  await session.commit()
-  return {"message": "Address deleted"}
+    address = await session.get(ShippingAddress, address_id)
+    if not address or address.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Address not found or not authorized",
+        )
+    await session.delete(address)
+    await session.commit()
+    return {"message": "Address deleted"}
