@@ -49,3 +49,15 @@ async def update_user_shipping_address_by_address_id(
     await session.commit()
     await session.refresh(address)
     return address
+
+async def delete_shipping_address_by_address_id(
+  session: AsyncSession, 
+  user_id: int, 
+  address_id: int
+):
+  address = await session.get(ShippingAddress, address_id)
+  if not address or address.user_id != user_id:
+      raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Address not found or not authorized")
+  await session.delete(address)
+  await session.commit()
+  return {"message": "Address deleted"}
