@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends
 from src.db.config import SessionDep
 from src.account.models import User
 from src.account.deps import get_current_user
-from src.shipping.schemas import ShippingAddressOut, ShippingAddressCreate, ShippingAddressUpdate
+from src.shipping.schemas import (
+    ShippingAddressOut,
+    ShippingAddressCreate,
+    ShippingAddressUpdate,
+)
 from src.shipping.services import (
     create_shipping_address,
     delete_shipping_address_by_address_id,
@@ -37,19 +41,21 @@ async def shipping_address_user_by_address_id(
 ):
     return await get_user_shipping_address_by_address_id(session, address_id, user.id)
 
+
 @router.patch("/addresses/{address_id}", response_model=ShippingAddressOut)
 async def user_shipping_address_update_by_address_id(
-  session: SessionDep,
-  address_id: int,
-  data: ShippingAddressUpdate,
-  user: User = Depends(get_current_user)
+    session: SessionDep,
+    address_id: int,
+    data: ShippingAddressUpdate,
+    user: User = Depends(get_current_user),
 ):
-  return await update_user_shipping_address_by_address_id(session, address_id, user.id, data)
+    return await update_user_shipping_address_by_address_id(
+        session, address_id, user.id, data
+    )
+
 
 @router.delete("/addresses/{address_id}")
 async def shipping_address_delete_by_address_id(
-  session: SessionDep,
-  address_id: int,
-  user: User = Depends(get_current_user)
+    session: SessionDep, address_id: int, user: User = Depends(get_current_user)
 ):
-  return await delete_shipping_address_by_address_id(session, user.id, address_id)
+    return await delete_shipping_address_by_address_id(session, user.id, address_id)
