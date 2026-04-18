@@ -22,9 +22,10 @@ class User(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
-
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         "RefreshToken", back_populates="user", cascade="all, delete-orphan"
     )
@@ -34,7 +35,6 @@ class User(Base):
     shipping_addresses: Mapped[list["ShippingAddress"]] = relationship(
         "ShippingAddress", back_populates="user", cascade="all, delete-orphan"
     )
-
 
 
 class RefreshToken(Base):
