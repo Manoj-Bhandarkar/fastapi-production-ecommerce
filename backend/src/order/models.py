@@ -20,3 +20,12 @@ class Order(Base):
   shipping_address_id: Mapped[int] = mapped_column(ForeignKey("shipping_addresses.id"), nullable=False)
   created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
+
+class OrderItem(Base):
+  __tablename__ = "order_items"
+
+  id: Mapped[int] = mapped_column(primary_key=True, index=True)
+  order_id: Mapped[int] = mapped_column(ForeignKey("orders.id", ondelete="CASCADE"), nullable=False)
+  product_id: Mapped[int | None] = mapped_column(ForeignKey("products.id", ondelete="SET NULL"), nullable=True)
+  quantity: Mapped[int] = mapped_column(nullable=False)
+  price: Mapped[float] = mapped_column(nullable=False)
