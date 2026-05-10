@@ -1,6 +1,6 @@
 from src.account.models import User
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import Select
+from sqlalchemy import select
 from fastapi import HTTPException, status
 from src.account.schemas import (
     PasswordResetEmailRequest,
@@ -20,7 +20,7 @@ from src.account.utils import (
 
 
 async def create_user(session: AsyncSession, user: UserCreate):
-    stmt = Select(User).where(User.email == user.email)
+    stmt = select(User).where(User.email == user.email)
     result = await session.scalar(stmt)
 
     if result:
@@ -37,7 +37,7 @@ async def create_user(session: AsyncSession, user: UserCreate):
 
 
 async def authenticate_user(session: AsyncSession, user_login: UserLogin):
-    stmt = Select(User).where(User.email == user_login.email)
+    stmt = select(User).where(User.email == user_login.email)
     result = await session.scalars(stmt)
     user = result.first()
 
@@ -61,7 +61,7 @@ async def verify_email_token(session: AsyncSession, token: str):
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
         )
 
-    stmt = Select(User).where(User.id == user_id)
+    stmt = select(User).where(User.id == user_id)
     result = await session.scalars(stmt)
     user = result.first()
 
@@ -112,7 +112,7 @@ async def verify_password_reset_token(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired token"
         )
 
-    stmt = Select(User).where(User.id == user_id)
+    stmt = select(User).where(User.id == user_id)
     result = await session.scalars(stmt)
     user = result.first()
 
