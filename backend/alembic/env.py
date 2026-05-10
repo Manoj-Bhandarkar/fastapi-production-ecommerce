@@ -9,7 +9,12 @@ from alembic import context
 
 from decouple import config as env_config
 from src.db.base import Base
-from src.db import models
+from src.account import models as account_models
+from src.product import models as product_models
+from src.cart import models as cart_models
+from src.shipping import models as shipping_models
+from src.order import models as order_models
+from src.payment import models as payment_models
 # for every register frist in models and then auto matic register in alembic
 
 # this is the Alembic Config object, which provides
@@ -27,7 +32,7 @@ DB_NAME = env_config("DB_NAME")
 DB_PORT = env_config("DB_PORT", cast=int)
 DB_HOST = env_config("DB_HOST")
 
-DATABASE_URL = f"mysql+aiomysql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
