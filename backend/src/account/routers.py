@@ -46,7 +46,7 @@ async def login(session: SessionDep, user_login: UserLogin):
         httponly=True,
         secure=True,
         samesite="lax",
-        max_age=60 * 60 * 24 * 1,
+        max_age=60 * 30,
     )
     response.set_cookie(
         "refresh_token",
