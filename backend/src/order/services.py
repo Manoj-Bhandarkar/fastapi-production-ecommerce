@@ -1,12 +1,9 @@
 from fastapi import HTTPException, status
-from decimal import Decimal
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from src.cart.models import CartItem
-from src.product.models import Product
-from src.shipping.models import ShippingAddress, ShippingStatusEnum
-from src.order.models import Order, OrderItem, OrderStatusEnum
+from src.order.models import Order
 from src.payment.schemas import PaymentCreate
 
 

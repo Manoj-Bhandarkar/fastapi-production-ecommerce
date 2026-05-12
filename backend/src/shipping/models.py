@@ -1,9 +1,12 @@
-from datetime import datetime, timezone
+from typing import TYPE_CHECKING
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, String, ForeignKey, Enum
+from sqlalchemy import String, ForeignKey
 from src.account.models import User
 from src.db.base import Base
 
+if TYPE_CHECKING:
+    from src.order.models import Order
 
 class ShippingAddress(Base):
     __tablename__ = "shipping_addresses"

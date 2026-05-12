@@ -9,12 +9,13 @@ from alembic import context
 
 from decouple import config as env_config
 from src.db.base import Base
-from src.account import models as account_models
-from src.product import models as product_models
-from src.cart import models as cart_models
-from src.shipping import models as shipping_models
-from src.order import models as order_models
-from src.payment import models as payment_models
+from src.account import models as account_models     # noqa: F401
+from src.product import models as product_models     # noqa: F401
+from src.cart import models as cart_models           # noqa: F401
+from src.shipping import models as shipping_models   # noqa: F401
+from src.order import models as order_models         # noqa: F401
+from src.payment import models as payment_models     # noqa: F401
+
 # for every register frist in models and then auto matic register in alembic
 
 # this is the Alembic Config object, which provides

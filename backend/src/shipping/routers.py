@@ -15,7 +15,6 @@ from src.shipping.services import (
     update_user_shipping_address_by_address_id,
 )
 
-
 router = APIRouter()
 
 

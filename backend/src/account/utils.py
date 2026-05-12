@@ -10,10 +10,10 @@ import uuid
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-JWT_ACCESS_TOKEN_TIME_MIN = config("JWT_ACCESS_TOKEN_TIME_MIN", cast=int)
-JWT_ALGORITHM = config("JWT_ALGORITHM")
 JWT_SECRET_KEY = config("JWT_SECRET_KEY")
-JWT_REFRESH_TOKEN_TIME_DAY = config("JWT_REFRESH_TOKEN_TIME_DAY", cast=int)
+JWT_ALGORITHM = config("JWT_ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = config("ACCESS_TOKEN_EXPIRE_MINUTES", cast=int)
+REFRESH_TOKEN_EXPIRE_DAYS = config("REFRESH_TOKEN_EXPIRE_DAYS", cast=int)
 EMAIL_VERIFICATION_TOKEN_TIME_HOUR = config(
     "EMAIL_VERIFICATION_TOKEN_TIME_HOUR", cast=int
 )
@@ -33,7 +33,7 @@ def verify_password(plain_password, hashed_password):
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (
-        expires_delta or timedelta(minutes=JWT_ACCESS_TOKEN_TIME_MIN)
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, JWT_SECRET_KEY, JWT_ALGORITHM)
@@ -43,7 +43,7 @@ async def create_tokens(session: AsyncSession, user: User):
     access_token = create_access_token(data={"sub": str(user.id)})
 
     refresh_token_str = str(uuid.uuid4())
-    expires_at = datetime.now(timezone.utc) + timedelta(days=JWT_REFRESH_TOKEN_TIME_DAY)
+    expires_at = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 
     refresh_token = RefreshToken(
         user_id=user.id, token=refresh_token_str, expires_at=expires_at
