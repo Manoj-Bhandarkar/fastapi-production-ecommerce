@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from src.account.models import User
 from src.db.config import SessionDep
+from typing import Annotated
 from src.account.schemas import (
     PasswordChangeRequest,
     PasswordResetEmailRequest,
@@ -60,7 +61,7 @@ async def login(session: SessionDep, user_login: UserLogin):
 
 
 @router.get("/me", response_model=UserOut)
-async def me(user: User = Depends(get_current_user)):
+async def me(user: Annotated[User, Depends(get_current_user)]):
     return user
 
 
