@@ -42,7 +42,9 @@ async def authenticate_user(session: AsyncSession, user_login: UserLogin):
     user = result.first()
 
     if not user or not verify_password(user_login.password, user.hashed_password):
-        return None
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
+        )
 
     return user
 
