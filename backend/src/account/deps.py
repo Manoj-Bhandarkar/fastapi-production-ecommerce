@@ -12,29 +12,28 @@ async def get_current_user(session: SessionDep, request: Request):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Missing Access Token",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     payload = decode_token(token)
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or Expired Token",
-            headers={"WWW-Authenticate": "Bearer"},
         )
+    if payload.get("type") != "access":
+        raise HTTPException(status_code=401, detail="Invalid token type")
     user_id = payload.get("sub")
+
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalide Token",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail="Invalid Token Payload",
         )
     stmt = select(User).where(User.id == int(user_id))
     user = await session.scalar(stmt)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalide Token",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail="User Not Found",
         )
     return user
 

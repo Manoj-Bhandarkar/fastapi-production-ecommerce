@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+import secrets
 from passlib.context import CryptContext
 from datetime import timedelta, datetime, timezone
 from decouple import config
@@ -6,7 +6,6 @@ from jose import ExpiredSignatureError, JWTError, jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.account.models import User, RefreshToken
-import uuid
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -40,9 +39,9 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
 
 
 async def create_tokens(session: AsyncSession, user: User):
-    access_token = create_access_token(data={"sub": str(user.id)})
+    access_token = create_access_token(data={"sub": str(user.id), "type": "access"})
 
-    refresh_token_str = str(uuid.uuid4())
+    refresh_token_str = secrets.token_urlsafe(64)
     expires_at = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
 
     refresh_token = RefreshToken(
@@ -60,15 +59,13 @@ async def create_tokens(session: AsyncSession, user: User):
 
 def decode_token(token: str):
     try:
-        return jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        return payload
+
     except ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
-        )
+        return None
     except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token"
-        )
+        return None
 
 
 async def verify_refresh_token(session: AsyncSession, token: str):
