@@ -86,8 +86,8 @@ def create_email_verification_token(user_id: int):
     expire = datetime.now(timezone.utc) + timedelta(
         hours=EMAIL_VERIFICATION_TOKEN_TIME_HOUR
     )
-    to_encode = {"sub": str(user_id), "type": "verify_email", "exp": expire}
-    return jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+    payload = {"sub": str(user_id), "type": "verify_email", "exp": expire}
+    return jwt.encode(payload, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
 
 
 def verify_email_token_and_get_user_id(token: str, token_type: str):
