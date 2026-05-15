@@ -117,7 +117,11 @@ async def password_change(
     user: User = Depends(get_current_user),
 ):
     await change_password(session, user, data)
-    return {"msg": "Password changed successfully..."}
+    response = JSONResponse(content={"msg": "Password changed successfully. Please login again."})
+
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
+    return response
 
 
 @router.post("/send-password-reset-email")

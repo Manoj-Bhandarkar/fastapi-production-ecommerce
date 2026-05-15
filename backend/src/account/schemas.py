@@ -30,11 +30,11 @@ class PasswordChangeRequest(BaseModel):
     @classmethod
     def validate_new_password_strength(cls, value: str) -> str:
         if value.lower() == value or value.upper() == value:
-            raise ValueError(
-                "Password must contain both uppercase and lowercase letters"
-            )
+            raise ValueError("Password must contain uppercase and lowercase letters")
         if not any(char.isdigit() for char in value):
             raise ValueError("Password must contain at least one digit")
+        if not any(char in "!@#$%^&*" for char in value):
+            raise ValueError("Password must contain a special character")
         return value
 
 
@@ -50,9 +50,9 @@ class PasswordResetRequest(BaseModel):
     @classmethod
     def validate_new_password_strength(cls, value: str) -> str:
         if value.lower() == value or value.upper() == value:
-            raise ValueError(
-                "Password must contain both uppercase and lowercase letters"
-            )
+            raise ValueError("Password must contain uppercase and lowercase letters")
         if not any(char.isdigit() for char in value):
             raise ValueError("Password must contain at least one digit")
+        if not any(char in "!@#$%^&*" for char in value):
+            raise ValueError("Password must contain a special character")
         return value

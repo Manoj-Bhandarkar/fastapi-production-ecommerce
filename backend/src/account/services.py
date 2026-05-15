@@ -1,4 +1,4 @@
-from src.account.models import User
+from src.account.models import RefreshToken, User
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from fastapi import HTTPException, status
@@ -85,8 +85,19 @@ async def change_password(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Old password is incorrect"
         )
+    if data.old_password == data.new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different",
+        )
     user.hashed_password = hash_password(data.new_password)
-    session.add(user)
+
+    # revoke refresh tokens
+    stmt = select(RefreshToken).where(RefreshToken.user_id == user.id)
+    refresh_tokens = await session.scalars(stmt)
+
+    for token in refresh_tokens:
+        token.revoked = True
     await session.commit()
 
 
