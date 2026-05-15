@@ -111,7 +111,7 @@ async def password_reset_email_send(
         )
 
     token = create_password_reset_token(user.id)
-    link = f"http://localhost:8000/api/account/password-reset?token={token}"
+    link = f"http://localhost:3000/reset-password?token={token}"
     print(f"Reset your password : {link}")
     return {"msg": "Password reset link sent successfully..."}
 
@@ -133,8 +133,19 @@ async def verify_password_reset_token(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
         )
+    if verify_password(data.new_password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="New password must be different",
+        )
 
     user.hashed_password = hash_password(data.new_password)
-    session.add(user)
+
+    # revoke all refresh tokens
+    stmt = select(RefreshToken).where(RefreshToken.user_id == user.id)
+    refresh_tokens = await session.scalars(stmt)
+    for token in refresh_tokens:
+        token.revoked = True
+
     await session.commit()
     return {"msg": "Password reset successfully..."}
