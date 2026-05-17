@@ -1,4 +1,5 @@
 from fastapi import HTTPException, UploadFile, status
+from slugify import slugify
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.product.utils import generate_slug, save_upload_file
@@ -15,13 +16,22 @@ from sqlalchemy.orm import selectinload
 
 ################# Category ###################
 async def create_category(
-    session: AsyncSession, category: CategoryCreate
-) -> CategoryOut:
-    category = Category(name=category.name)
-    session.add(category)
+    session: AsyncSession,
+    category: CategoryCreate,
+):
+    slug = slugify(category.name)
+    stmt = select(Category).where(Category.name.ilike(category.name))|(Category.slug == slug)
+    existing_category = await session.scalar(stmt)
+    if existing_category:
+        raise HTTPException(
+            status_code=400,
+            detail="Category already exists",
+        )
+    db_category = Category(name=category.name)
+    session.add(db_category)
     await session.commit()
-    await session.refresh(category)
-    return category
+    await session.refresh(db_category)
+    return db_category
 
 
 async def get_all_category(session: AsyncSession) -> list[CategoryOut]:

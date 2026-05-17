@@ -3,7 +3,10 @@ from pydantic import BaseModel, Field
 
 ################# Category ###################
 class CategoryBase(BaseModel):
-    name: str
+    name: str = Field(
+        min_length=2,
+        max_length=50,
+    )
 
 
 class CategoryCreate(CategoryBase):
@@ -12,7 +15,7 @@ class CategoryCreate(CategoryBase):
 
 class CategoryOut(CategoryBase):
     id: int
-    name: str
+    slug: str
     model_config = {"from_attributes": True}
 
 
