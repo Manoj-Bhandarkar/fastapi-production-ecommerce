@@ -137,10 +137,10 @@ async def search_products(
     filters = []
 
     if title:
-        filters.append(Product.title.like(f"%{title}%"))
+        filters.append(Product.title.ilike(f"%{title}%"))
 
     if description:
-        filters.append(Product.description.like(f"%{description}%"))
+        filters.append(Product.description.ilike(f"%{description}%"))
 
     if min_price is not None:
         filters.append(Product.price >= min_price)
@@ -151,13 +151,13 @@ async def search_products(
     if filters:
         stmt = stmt.where(and_(*filters))
 
-    count_stmt = stmt.with_only_columns(func.count(Product.id)).order_by(None)
+    count_stmt = select(func.count()).select_from(stmt.subquery())
     total = await session.scalar(count_stmt)
 
     stmt = stmt.limit(limit).offset((page - 1) * limit)
 
     result = await session.execute(stmt)
-    products = result.scalars().all()
+    products = result.scalars().unique().all()
 
     return {"total": total, "page": page, "limit": limit, "items": products}
 
