@@ -185,7 +185,7 @@ async def update_product_by_id(
         product.categories = category_result.scalars().all()
 
     for key, value in data.model_dump(
-        exclude={"category_id"}, exclude_none=True
+        exclude={"category_ids"}, exclude_none=True
     ).items():
         setattr(product, key, value)
 

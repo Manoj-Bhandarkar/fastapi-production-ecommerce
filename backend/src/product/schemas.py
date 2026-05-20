@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from decimal import Decimal
 
 ################# Category ###################
 class CategoryBase(BaseModel):
@@ -23,7 +23,7 @@ class CategoryOut(CategoryBase):
 class ProductBase(BaseModel):
     title: str
     description: str | None = None
-    price: float = Field(gt=0)
+    price: Decimal = Field(gt=0)
     stock_quantity: int = Field(ge=0)
 
 
@@ -36,7 +36,7 @@ class ProductOut(ProductBase):
     title: str
     description: str
     slug: str
-    price: float
+    price: Decimal
     categories: list[CategoryOut] = []
     image_url: str | None = None
     model_config = {"from_attributes": True}
@@ -52,7 +52,7 @@ class PaginatedProductOut(BaseModel):
 class ProductUpdate(BaseModel):
     title: str | None = None
     description: str | None = None
-    price: float | None = None
+    price: Decimal | None = None
     stock_quantity: int | None = None
     image_url: str | None = None
     category_ids: list[int] | None = None

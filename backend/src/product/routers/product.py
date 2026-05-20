@@ -11,7 +11,12 @@ from fastapi import (
 )
 from src.account.models import User
 from src.db.config import SessionDep
-from src.product.schemas import ProductCreate, ProductOut, PaginatedProductOut
+from src.product.schemas import (
+    ProductCreate,
+    ProductOut,
+    PaginatedProductOut,
+    ProductUpdate,
+)
 from src.account.deps import require_admin
 from src.product.services import (
     create_product,
@@ -19,6 +24,7 @@ from src.product.services import (
     get_all_products,
     get_product_by_slug,
     search_products,
+    update_product_by_id,
 )
 
 router = APIRouter()
@@ -86,6 +92,34 @@ async def products_search(
         limit=limit,
         page=page,
     )
+
+
+@router.patch("/{product_id}", response_model=ProductOut)
+async def product_update_by_id(
+    session: SessionDep,
+    product_id: int,
+    title: str | None = Form(None),
+    description: str | None = Form(None),
+    price: float | None = Form(None),
+    stock_quantity: int | None = Form(None),
+    category_ids: list[int] | None = Form(None),
+    image_url: UploadFile | None = File(None),
+    admin_user: User = Depends(require_admin),
+):
+    data = ProductUpdate(
+        title=title,
+        description=description,
+        price=price,
+        stock_quantity=stock_quantity,
+        category_ids=category_ids,
+    )
+
+    product = await update_product_by_id(session, product_id, data, image_url)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Product not found"
+        )
+    return product
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
