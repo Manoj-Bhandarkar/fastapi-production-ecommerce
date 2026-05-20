@@ -56,7 +56,7 @@ class Product(Base):
         "Category", secondary=product_category_table, back_populates="products"
     )
     cart_items: Mapped[list["CartItem"]] = relationship(
-        "CartItem", back_populates="product", cascade="all, delete-orphan"
+        "CartItem", back_populates="product"
     )
 
 

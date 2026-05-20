@@ -1,3 +1,5 @@
+from decimal import Decimal
+from sqlalchemy import Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Float, ForeignKey
 from src.account.models import User
@@ -16,7 +18,7 @@ class CartItem(Base):
         ForeignKey("products.id", ondelete="SET NULL"), nullable=True
     )
     quantity: Mapped[int] = mapped_column(default=1)
-    price: Mapped[float] = mapped_column(Float, nullable=False)
+    price: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
 
     user: Mapped["User"] = relationship("User", back_populates="cart_items")
     product: Mapped["Product"] = relationship("Product", back_populates="cart_items")
