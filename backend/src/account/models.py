@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Boolean, DateTime, ForeignKey
 from datetime import datetime, timezone
+from backend.src.payment.models import Payment
 from src.order.models import Order
 from src.db.base import Base
 from typing import TYPE_CHECKING
@@ -37,10 +38,14 @@ class User(Base):
         "ShippingAddress", back_populates="user", cascade="all, delete-orphan"
     )
     orders: Mapped[list["Order"]] = relationship(
-    "Order",
-    back_populates="user",
-    cascade="all, delete-orphan",
-)
+        "Order",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    payments: Mapped[list["Payment"]] = relationship(
+        "Payment",
+        back_populates="user",
+    )
 
 
 class RefreshToken(Base):

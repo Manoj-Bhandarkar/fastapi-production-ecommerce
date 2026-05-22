@@ -3,6 +3,7 @@ from decimal import Decimal
 from sqlalchemy import Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, DateTime, Enum
+from backend.src.payment.models import Payment
 from src.account.models import User
 from src.product.models import Product
 from typing import TYPE_CHECKING
@@ -57,9 +58,9 @@ class Order(Base):
         lazy="selectin",
     )
     user: Mapped["User"] = relationship(
-    "User",
-    back_populates="orders",
-)
+        "User",
+        back_populates="orders",
+    )
 
 
 class OrderItem(Base):
@@ -77,4 +78,11 @@ class OrderItem(Base):
     order: Mapped["Order"] = relationship("Order", back_populates="orderitems")
     product: Mapped["Product | None"] = relationship(
         "Product", back_populates="orderitems", lazy="selectin"
+    )
+
+    payment: Mapped["Payment"] = relationship(
+        "Payment",
+        back_populates="order",
+        uselist=False,
+        cascade="all, delete-orphan",
     )
